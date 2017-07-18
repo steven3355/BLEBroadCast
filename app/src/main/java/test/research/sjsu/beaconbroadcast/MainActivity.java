@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     BluetoothLeAdvertiser mBluetoothLeAdvertiser;
     AdvertiseData mAdvertiseData;
     AdvertiseData.Builder mAdvertiseDataBuilder;
-    byte[] Data = new byte[4];
+    byte[] Data = new byte[10];
     ParcelUuid mServiceDataUUID;
     AdvertiseSettings mAdvertiseSettings;
     AdvertiseSettings.Builder mAdvertiseSettingBuilder = new AdvertiseSettings.Builder();
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     Button StopBroadcastButton;
     Switch mSwitch;
     Boolean switchState;
+    ParcelUuid mServiceUUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-        Data = hexStringToByteArray("12");
-
+        Data = hexStringToByteArray("12345678901234567890");
+        mServiceDataUUID = ParcelUuid.fromString("00009208-0000-1000-8000-00805F9B34FB");
         // mAdvertiseDataBuilder.addServiceData(mServiceDataUUID,Data);
         mAdvertiseSettingBuilder.setAdvertiseMode(1);
         mAdvertiseSettingBuilder.setTimeout(0);
@@ -85,18 +86,19 @@ public class MainActivity extends AppCompatActivity {
         switchState = mSwitch.isChecked();
         if(switchState.booleanValue()){
             mAdvertiseDataBuilder = new AdvertiseData.Builder();
-            mServiceDataUUID = ParcelUuid.fromString("00001830-0000-1000-8000-00805F9B34FB");
+            mAdvertiseDataBuilder.addServiceData(mServiceDataUUID,Data);
+            mServiceUUID = ParcelUuid.fromString("00001830-0000-1000-8000-00805F9B34FB");
             mAdvertiseDataBuilder.setIncludeDeviceName(true);
             mAdvertiseDataBuilder.setIncludeTxPowerLevel(true);
-            mAdvertiseDataBuilder.addServiceUuid(mServiceDataUUID);
+            mAdvertiseDataBuilder.addServiceUuid(mServiceUUID);
             mAdvertiseData = mAdvertiseDataBuilder.build();
         }
         else{
             mAdvertiseDataBuilder = new AdvertiseData.Builder();
-            mServiceDataUUID = ParcelUuid.fromString("00001829-0000-1000-8000-00805F9B34FB");
+            mServiceUUID = ParcelUuid.fromString("00001829-0000-1000-8000-00805F9B34FB");
             mAdvertiseDataBuilder.setIncludeDeviceName(true);
             mAdvertiseDataBuilder.setIncludeTxPowerLevel(true);
-            mAdvertiseDataBuilder.addServiceUuid(mServiceDataUUID);
+            mAdvertiseDataBuilder.addServiceUuid(mServiceUUID);
             mAdvertiseData = mAdvertiseDataBuilder.build();
         }
         mBluetoothLeAdvertiser.startAdvertising(mAdvertiseSettings,mAdvertiseData,mCallback);
